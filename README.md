@@ -176,8 +176,8 @@ AIが判定した状況（順調・要確認・リスクあり）に応じて、
 
 1. **リポジトリをクローン**
 ```bash
-git clone git@github.com:your-username/checkpoint-ai.git
-cd checkpoint-ai
+git clone git@github.com:ando625/checkAI.git
+cd checkAI
 ```
 
 2. **Dockerコンテナの起動**
