@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+
+# env
+.env
+
+# node
+node_modules
+.next
+npm-debug.log
+
+# laravel
+/vendor
+/storage/*.key
+/bootstrap/cache/*.php
+
+# docker mysql data
+/docker/mysql/data
+
+# logs
+*.log
