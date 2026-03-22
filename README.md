@@ -6,7 +6,7 @@
 このアプリを一言でいうと、 **「AIがマネージャーの代わりをしてくれる、お仕事報告管理ツール」** です。
 単に業務報告を保存するだけでなく、Python（FastAPI）とGemini AIを連携させ、投稿内容から「仕事の危険度」を自動でスコア化し、要約まで行うことで、チームの状況をひと目で把握できる仕組みを実現しました。
 
-動画投入
+https://github.com/user-attachments/assets/810ce9bd-8881-402e-9301-9ff4f4d25aa1
 
 ---
 
@@ -123,6 +123,8 @@ AIが判定した状況（順調・要確認・リスクあり）に応じて、
 マイページから名前の変更と、自分が投稿した報告書の一覧確認ができます。
 8. **ページネーション**
 報告書が増えても快適に閲覧できるよう、一覧表示にページネーションを実装しています。
+
+機能要件：https://docs.google.com/spreadsheets/d/1DTRqEVQvEwA02As2Awfg9wv-ecgeEGetrDaqXLCTJsw/edit?usp=sharing
 
 ---
 
