@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ManualChatController;
 use App\Http\Controllers\MypageController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
@@ -59,6 +60,9 @@ Route::middleware('auth:sanctum')->group(function (){
 
     // 通知：１件既読にする
     Route::put('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+
+    //マニュアル質問ルート
+    Route::post('/ask-manual', [ManualChatController::class, 'ask']);
 
 
 

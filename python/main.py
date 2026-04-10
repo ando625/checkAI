@@ -7,6 +7,44 @@ import os
 import json
 import re
 from typing import Literal
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
+from llama_index.llms.gemini import Gemini
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+
+# --- 追加：LlamaIndex の初期設定 ---
+# AIの脳（LLM）と、文字をベクトル化するエンジン（Embedding）を設定
+
+Settings.llm = Gemini(
+    model_name="models/gemini-2.5-flash", 
+    api_key=os.environ["GEMINI_API_KEY"]
+)
+
+# AIの「理解力（Embedding）」を設定
+# GoogleのAPIを通さず、自分のPC内で計算する方式（HuggingFace）に
+Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+
+index = None
+
+# マニュアルを読み込んで、AIが検索できる状態にする関数
+def get_query_engine():
+    global index
+    if index is None:
+        # dataフォルダがなければ作ります
+        if not os.path.exists("./data"):
+            os.makedirs("./data")
+        
+        # dataフォルダの中にあるPDFやテキストをすべて読み取り
+        documents = SimpleDirectoryReader("./data").load_data()
+        
+        if not documents:
+            return None
+            
+        # 読み取った内容を元に、AI専用の「索引」を作ります
+        index = VectorStoreIndex.from_documents(documents)
+    
+    # AIが質問に答えるための「窓口（エンジン）」を返します
+    return index.as_query_engine()
+
 
 app = FastAPI(title="CheckPoint AI Service")
 
@@ -70,6 +108,10 @@ class InsightsResponse(BaseModel):
     sentiment: SentimentResult     #感情分析
     overall_summary: str           #全体的な一言まとめ
 
+
+# --- 追加：RAG専用のレスポンス型 ---
+class AskManualResponse(BaseModel):
+    answer: str
 
 # -------------------------
 # プロンプト AIに渡す指示テンプレート 役割を与えると精度が上がる
@@ -326,3 +368,30 @@ async def insights(req: InsightsRequest):
         sentiment=sentiment,
         overall_summary=str(data.get("overall_summary", ""))[:50],
     )
+    
+
+
+# [RAG機能] マニュアルについてAIに質問する窓口
+@app.post("/ask-manual", response_model=AskManualResponse)
+async def ask_manual(req: AnalyzeRequest):
+    if not req.content:
+        raise HTTPException(status_code=422, detail="質問が空です")
+
+    try:
+        # マニュアルを準備
+        engine = get_query_engine()
+        
+        # ファイルが何も読み込めていない場合の返事
+        if engine is None:
+            return AskManualResponse(answer="マニュアルファイルが ./data フォルダに見つかりませんでした。")
+        
+        # AIに「マニュアルに基づいて答えて」
+        response = engine.query(f"社内マニュアルに基づいて日本語で回答してください: {req.content}")
+        
+        # AIの答えを返す
+        return AskManualResponse(answer=str(response))
+        
+    except Exception as e:
+        # 何かエラーが起きたら、サーバーを止めずにエラー内容を表示
+        print(f"RAGエラーが発生しました: {e}")
+        return AskManualResponse(answer="すみません、マニュアルを読み取る途中でエラーが起きました。")

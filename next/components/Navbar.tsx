@@ -11,6 +11,7 @@ import {
     LogOut,
     Menu,
     X,
+    MessageSquareText,
 } from 'lucide-react'; // Menu, X を追加
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -98,6 +99,7 @@ export function Navbar() {
     const navItems = [
         { href: '/dashboard', label: 'ホーム', icon: LayoutDashboard },
         { href: '/analytics', label: '分析データ', icon: BarChart2 },
+        { href: '/chat', label: 'AIチャット', icon: MessageSquareText },
         { href: '/mypage', label: 'マイページ', icon: User },
     ];
 
@@ -137,6 +139,15 @@ export function Navbar() {
 
                 {/* 右側エリア */}
                 <div className="flex items-center gap-2 md:gap-4">
+                    {/* AIチャットへのクイックアクセスボタン */}
+                    <Link
+                        href="/chat"
+                        className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors text-xs font-bold border border-blue-100"
+                    >
+                        <MessageSquareText className="w-3.5 h-3.5" />
+                        AIに相談
+                    </Link>
+
                     {/* ベルアイコン＋ドロップダウン */}
                     <div className="relative" ref={notifRef}>
                         <button
